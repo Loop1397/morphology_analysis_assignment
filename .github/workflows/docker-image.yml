@@ -17,6 +17,12 @@ jobs:
     # 작업이 실행될 환경 지정
     runs-on: ubuntu-latest
 
+    # 변수 생성
+    env:
+      IMAGE_NAME: morphology-analysis-assignment
+      # $(date +%s) 현재 시간을 가져와서 저장(초단위)
+      IMAGE_TAG: $(date +%s)
+
     # 작업 단계들 나열
     steps:
     
@@ -26,7 +32,7 @@ jobs:
     # name은 그냥 workflow의 이름. 사용자가 설정하는 주석 같은거라고 생각하면 됨
     # Docker 이미지를 빌드. Dockerfile을 사용하여 이미지를 빌드하고, 태그를 현재 타임스태프로 설정함.
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag morphology-analysis-assignment:$(date +%s)
+      run: docker build . --file Dockerfile --tag ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
     # Docker Hub에 로그인하는 단계. secrets에서 설정된 환경 변수를 사용하여 인증
     # DOCKERHUB_TOKEN과 DOCKERHUB_USERNAME은 Github repository의 Secrets에 저장되어야함.
@@ -36,4 +42,4 @@ jobs:
     # 빌드된 Docker 이미지를 Docker Hub로 푸시하는 단계.
     # 동적으로 생성된 태그를 사용하여 이미지를 푸시함.
     - name: Push image to Docker Hub
-      run: docker push "${{ secrets.DOCKERHUB_USERNAME }}"/morphology-analysis-assignment:$(date +%s)
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_NAME }}
