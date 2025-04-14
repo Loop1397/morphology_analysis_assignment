@@ -1,0 +1,39 @@
+name: Docker Image CI
+
+# 이 workflow가 언제 실행될지를 설정.
+# main branch에 push나 pull_request가 될 때마다 본 action을 자동으로 실행
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+# workflow의 작업을 정의.
+jobs:
+
+  # 빌드 작업을 정의.
+  build:
+
+    # 작업이 실행될 환경 지정
+    runs-on: ubuntu-latest
+
+    # 작업 단계들 나열
+    steps:
+    
+    # Github action을 사용하여 현재 레포지토리를 체크아웃.(branch 바꾸는 checkout)
+    - uses: actions/checkout@v4
+
+    # name은 그냥 workflow의 이름. 사용자가 설정하는 주석 같은거라고 생각하면 됨
+    # Docker 이미지를 빌드. Dockerfile을 사용하여 이미지를 빌드하고, 태그를 현재 타임스태프로 설정함.
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag morphology-analysis-assignment:$(date +%s)
+
+    # Docker Hub에 로그인하는 단계. secrets에서 설정된 환경 변수를 사용하여 인증
+    # DOCKERHUB_TOKEN과 DOCKERHUB_USERNAME은 Github repository의 Secrets에 저장되어야함.
+    - name: Log into Docker Hub
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+    # 빌드된 Docker 이미지를 Docker Hub로 푸시하는 단계.
+    # 동적으로 생성된 태그를 사용하여 이미지를 푸시함.
+    - name: Push image to Docker Hub
+      run: docker push morphology-analysis-assignment:$(date +%s)
