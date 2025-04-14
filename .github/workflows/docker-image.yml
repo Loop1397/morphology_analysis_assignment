@@ -19,7 +19,7 @@ jobs:
 
     # 변수 생성
     env:
-      IMAGE_NAME: morphology-analysis-assignment
+      IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/morphology_analysis_assignment
 
     # 작업 단계들 나열
     steps:
@@ -45,4 +45,4 @@ jobs:
     # 빌드된 Docker 이미지를 Docker Hub로 푸시하는 단계.
     # 동적으로 생성된 태그를 사용하여 이미지를 푸시함.
     - name: Push image to Docker Hub
-      run: docker push hotcake/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
