@@ -26,7 +26,7 @@ jobs:
 
     # IMAGE_TAG는 타임 스탬프를 사용한 변수로 만들기 위해 echo 사용
     - name: Set IMAGE_TAG from timestamp
-      id: set_tag
+      id: set_tag${{ secrets.DOCKERHUB_USERNAME }}
       run: echo "IMAGE_TAG=$(date +%s)" >> "$GITHUB_ENV"
     
     # Github action을 사용하여 현재 레포지토리를 체크아웃.(branch 바꾸는 checkout)
@@ -45,4 +45,4 @@ jobs:
     # 빌드된 Docker 이미지를 Docker Hub로 푸시하는 단계.
     # 동적으로 생성된 태그를 사용하여 이미지를 푸시함.
     - name: Push image to Docker Hub
-      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+      run: docker push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
