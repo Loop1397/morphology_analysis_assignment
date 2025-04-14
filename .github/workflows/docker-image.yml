@@ -26,7 +26,7 @@ jobs:
 
     # IMAGE_TAG는 타임 스탬프를 사용한 변수로 만들기 위해 echo 사용
     - name: Set IMAGE_TAG from timestamp
-      id: set_tag${{ secrets.DOCKERHUB_USERNAME }}
+      id: set_tag
       run: echo "IMAGE_TAG=$(date +%s)" >> "$GITHUB_ENV"
     
     # Github action을 사용하여 현재 레포지토리를 체크아웃.(branch 바꾸는 checkout)
