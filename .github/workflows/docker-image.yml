@@ -20,11 +20,14 @@ jobs:
     # 변수 생성
     env:
       IMAGE_NAME: morphology-analysis-assignment
-      # $(date +%s) 현재 시간을 가져와서 저장(초단위)
-      IMAGE_TAG: $(date +%s)
 
     # 작업 단계들 나열
     steps:
+
+    # IMAGE_TAG는 타임 스탬프를 사용한 변수로 만들기 위해 echo 사용
+    - name: Set IMAGE_TAG from timestamp
+      id: set_tag
+      run: echo "IMAGE_TAG=$(date +%s)" >> "$GITHUB_ENV"
     
     # Github action을 사용하여 현재 레포지토리를 체크아웃.(branch 바꾸는 checkout)
     - uses: actions/checkout@v4
