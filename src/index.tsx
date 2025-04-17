@@ -29,7 +29,7 @@ function Index() {
     }
 
     return (
-        <div style={{ width: "800px", borderRadius: "8px", backgroundColor: "#3C424A", marginTop: "100px", padding: "20px 60px" }}>
+        <div style={{ width: "800px", borderRadius: "8px", backgroundColor: "#3C424A", marginTop: "70px", padding: "20px 60px" }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
                 <h1>形態素解析</h1>
                 <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
