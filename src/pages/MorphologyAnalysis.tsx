@@ -6,10 +6,14 @@ import TableRows from "../components/TableRows";
 import { CSSTransition } from 'react-transition-group';
 
 import TinySegmenter from 'tiny-segmenter';
-import SeparateWords from "../components/SeparateWords";
+import SegmentedWords from "../components/SegmentedWords";
+
+const segmenter = new TinySegmenter(); // インスタンス生成
 
 function Index() {
     const [showTable, setShowTable] = useState(false);
+    const [text, setText] = useState('');
+    const [segmentedText, setSegmentedText] = useState<string[]>();
 
     const [rows, setRows] = useState([
         {
@@ -40,9 +44,6 @@ function Index() {
 
     const nodeRef = useRef(null);
 
-    const segmenter = new TinySegmenter(); // インスタンス生成
-    const result = segmenter.segment("私の名前は中野です。");
-
     return (
         <div style={{ width: "800px", borderRadius: "8px", backgroundColor: "#3C424A", marginTop: "100px", padding: "20px 60px" }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
@@ -51,11 +52,17 @@ function Index() {
                     <TextareaAutosize
                         minRows={3}
                         placeholder="テキストを入力"
+                        value={text}
+                        onChange={(event) => {
+                            setText(event.target.value);
+                        }}
                         style={{ flexGrow: "1", marginTop: "20px", padding: "10px", backgroundColor: "#343A40", border: "none", borderBottom: "2px solid #2F3339", borderRadius: "4px", color: "#ffffff", resize: "none" }}
                     />
                     <button
                         onClick={() => {
                             if (!showTable) {
+                                setSegmentedText(segmenter.segment(text));
+                                setText('');
                                 setShowTable(!showTable);
                             }
                             else {
@@ -81,7 +88,7 @@ function Index() {
                         style={{ width: "100%", overflow: "hidden" }}
                     >
                         <div style={{ width: "100%", height: "2px", backgroundColor: "#343840", marginTop: "20px", }}></div>
-                        <SeparateWords separate={result} />
+                        <SegmentedWords separate={segmentedText!} />
                         <TableRows rows={rows} />
                     </div>
                 </CSSTransition>

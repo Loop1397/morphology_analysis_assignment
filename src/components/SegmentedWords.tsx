@@ -1,5 +1,5 @@
 
-function SeparateWords({ separate }: { separate: string[] }) {
+function SegmentedWords({ separate }: { separate: string[] }) {
     return (
         <div>
             <p style={{ width: "100%", fontSize: "18px" }}>分かち書き</p>
@@ -10,4 +10,4 @@ function SeparateWords({ separate }: { separate: string[] }) {
     );
 }
 
-export default SeparateWords;
+export default SegmentedWords;
