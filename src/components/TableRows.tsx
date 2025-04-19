@@ -12,7 +12,7 @@ type TableRowsProps = {
 
 function TableRows({ rows }: TableRowsProps) {
     return (
-        <table style={{ width: "100%" }}>
+        <table style={{ width: "100%", marginTop: "30px" }}>
             <thead>
                 <tr>
                     <td style={{ borderBottom: "solid 2px #20C997" }}>順番</td>

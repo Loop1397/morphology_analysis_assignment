@@ -82,9 +82,7 @@ function Index() {
                     >
                         <div style={{ width: "100%", height: "2px", backgroundColor: "#343840", marginTop: "20px", }}></div>
                         <SeparateWords separate={result} />
-                        <div style={{ marginTop: "30px" }}>
-                            <TableRows rows={rows} />
-                        </div>
+                        <TableRows rows={rows} />
                     </div>
                 </CSSTransition>
             </div>
