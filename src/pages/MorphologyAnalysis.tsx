@@ -5,6 +5,9 @@ import TextareaAutosize from 'react-textarea-autosize';
 import TableRows from "../components/TableRows";
 import { CSSTransition } from 'react-transition-group';
 
+import TinySegmenter from 'tiny-segmenter';
+import SeparateWords from "../components/SeparateWords";
+
 function Index() {
     const [showTable, setShowTable] = useState(false);
 
@@ -31,9 +34,14 @@ function Index() {
             count: 1,
         };
         setRows([...rows, newRow]);
+        const segs = segmenter.segment("私の名前は中野です");
+        console.log(segs);
     }
 
     const nodeRef = useRef(null);
+
+    const segmenter = new TinySegmenter(); // インスタンス生成
+    const result = segmenter.segment("私の名前は中野です。");
 
     return (
         <div style={{ width: "800px", borderRadius: "8px", backgroundColor: "#3C424A", marginTop: "100px", padding: "20px 60px" }}>
@@ -73,10 +81,7 @@ function Index() {
                         style={{ width: "100%", overflow: "hidden" }}
                     >
                         <div style={{ width: "100%", height: "2px", backgroundColor: "#343840", marginTop: "20px", }}></div>
-                        <p style={{ width: "100%", fontSize: "18px" }}>分かち書き</p>
-                        <div style={{ width: "100%", backgroundColor: "#343A40", paddingLeft: "15px", paddingTop: "4px", borderBottom: "2px solid #2F3339", borderRadius: "4px", }}>
-                            <p>私 | は | 学生 | です | 。 |</p>
-                        </div>
+                        <SeparateWords separate={result} />
                         <div style={{ marginTop: "30px" }}>
                             <TableRows rows={rows} />
                         </div>
