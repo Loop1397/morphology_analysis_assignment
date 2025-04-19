@@ -15,6 +15,8 @@ function Index() {
     const [text, setText] = useState('');
     const [segmentedText, setSegmentedText] = useState<string[]>();
 
+    const nodeRef = useRef(null);
+
     const [rows, setRows] = useState([
         {
             id: 1,
@@ -29,20 +31,6 @@ function Index() {
             count: 1,
         },
     ]);
-
-    const addRow = () => {
-        const newRow = {
-            id: rows.length + 1,
-            word: "私",
-            features: "名詞,代名詞,一般,*,*,*,私,ワタシ,ワタシ",
-            count: 1,
-        };
-        setRows([...rows, newRow]);
-        const segs = segmenter.segment("私の名前は中野です");
-        console.log(segs);
-    }
-
-    const nodeRef = useRef(null);
 
     return (
         <div style={{ width: "800px", borderRadius: "8px", backgroundColor: "#3C424A", marginTop: "100px", padding: "20px 60px" }}>
@@ -60,13 +48,18 @@ function Index() {
                     />
                     <button
                         onClick={() => {
-                            if (!showTable) {
-                                setSegmentedText(segmenter.segment(text));
-                                setText('');
-                                setShowTable(!showTable);
+                            if (text === '') {
+                                alert('先にテキストを入力してください！');
                             }
                             else {
-                                addRow();
+                                if (showTable) {
+                                    setShowTable(false);
+                                }
+                                setTimeout(() => {
+                                    setSegmentedText(segmenter.segment(text));
+                                    setText('');
+                                    setShowTable(true);
+                                }, 300);
                             }
                         }}
                         style={{ marginTop: "20px", }}

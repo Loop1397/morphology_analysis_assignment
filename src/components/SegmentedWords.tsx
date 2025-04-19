@@ -1,4 +1,3 @@
-
 function SegmentedWords({ separate }: { separate: string[] }) {
     return (
         <div>
