@@ -6,11 +6,7 @@ type Row = {
     count: number;
 };
 
-type TableRowsProps = {
-    rows: Row[];
-}
-
-function TableRows({ rows }: TableRowsProps) {
+function TableRows({ rows }: { rows: Row[] }) {
     return (
         <table style={{ width: "100%", marginTop: "30px" }}>
             <thead>

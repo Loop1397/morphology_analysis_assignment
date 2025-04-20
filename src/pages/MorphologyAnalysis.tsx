@@ -7,8 +7,34 @@ import { CSSTransition } from 'react-transition-group';
 
 import TinySegmenter from 'tiny-segmenter';
 import SegmentedWords from "../components/SegmentedWords";
+import * as kuromoji from '@patdx/kuromoji';
 
 const segmenter = new TinySegmenter(); // インスタンス生成
+
+const myLoader: kuromoji.LoaderConfig = {
+    async loadArrayBuffer(url: string): Promise<ArrayBufferLike> {
+        // .gz 확장자를 제거합니다.
+        url = url.replace('.gz', '');
+        const res = await fetch(
+            'https://cdn.jsdelivr.net/npm/@aiktb/kuromoji@1.0.2/dict/' + url,
+        );
+        if (!res.ok) {
+            throw new Error(`Failed to fetch ${url}, status: ${res.status}`);
+        }
+        return res.arrayBuffer();
+    },
+};
+
+export const tokenizerPromise = new kuromoji.TokenizerBuilder({
+    loader: myLoader,
+}).build();
+
+type Row = {
+    id: number;
+    word: string;
+    features: string;
+    count: number;
+};
 
 function Index() {
     const [showTable, setShowTable] = useState(false);
@@ -17,20 +43,81 @@ function Index() {
 
     const nodeRef = useRef(null);
 
-    const [rows, setRows] = useState([
-        {
-            id: 1,
-            word: "学生",
-            features: "名詞,一般,*,*,*,*,学生,ガクセイ,ガクセイ",
-            count: 1,
-        },
-        {
-            id: 2,
-            word: "私",
-            features: "	名詞,代名詞,一般,*,*,*,私,ワタシ,ワタシ",
-            count: 1,
-        },
-    ]);
+    const [rows, setRows] = useState<Row[]>();
+
+    const tokenizeAndCountNouns = async (): Promise<Array<any> | null> => {
+        try {
+            const tokenizer = await tokenizerPromise;
+
+            // 形態素解析
+            const tokens = tokenizer.tokenize(text);
+
+            // 名詞以外は削除する
+            const filteredTokens = tokens.filter(token => token.pos === '名詞');
+
+            // 同じトークンを削除し、カウントする
+            const countedTokens: Record<string, any> = {};
+
+            filteredTokens.forEach(token => {
+                const key = token.surface_form;
+                if (countedTokens[key]) {
+                    countedTokens[key].count += 1;
+                }
+                else {
+                    countedTokens[key] = { ...token, 'count': 1 };
+                }
+            })
+
+            const targetObject = Object.keys(countedTokens)
+                .sort((a, b) => b.localeCompare(a, 'ja'))
+                .map(key => {
+                    // いらない要素を削除
+                    delete countedTokens[key].word_id;
+                    delete countedTokens[key].word_position;
+                    delete countedTokens[key].word_type;
+
+                    return countedTokens[key];
+                });
+
+            const result = Object.values(targetObject);
+
+            return result;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    const formatTokensForRows = (tokens: Array<any>): Row[] => {
+        console.log(tokens);
+        const result: Row[] = [];
+
+        tokens.forEach((token, index) => {
+            const features = [
+                token.pos,
+                token.pos_detail_1,
+                token.pos_detail_2,
+                token.pos_detail_3,
+                token.conjugated_form,
+                token.conjugated_type,
+                token.basic_form,
+            ];
+
+            // 下の２つはないかもしれないので条件をつける
+            if (token.pronunciation) features.push(token.pronunciation);
+            if (token.reading) features.push(token.reading);
+
+            const targetObject = {
+                id: index + 1,
+                word: token.surface_form,
+                features: features.join(','),
+                count: token.count,
+            };
+
+            result.push(targetObject);
+        });
+
+        return result;
+    }
 
     return (
         <div style={{ width: "800px", borderRadius: "8px", backgroundColor: "#3C424A", marginTop: "100px", padding: "20px 60px" }}>
@@ -55,8 +142,15 @@ function Index() {
                                 if (showTable) {
                                     setShowTable(false);
                                 }
-                                setTimeout(() => {
+                                setTimeout(async () => {
                                     setSegmentedText(segmenter.segment(text));
+                                    const tokens = await tokenizeAndCountNouns();
+                                    if (!tokens) {
+                                        setText('');
+                                        alert('ERROR!');
+                                        return;
+                                    }
+                                    setRows(formatTokensForRows(tokens));
                                     setText('');
                                     setShowTable(true);
                                 }, 300);
@@ -82,7 +176,7 @@ function Index() {
                     >
                         <div style={{ width: "100%", height: "2px", backgroundColor: "#343840", marginTop: "20px", }}></div>
                         <SegmentedWords separate={segmentedText!} />
-                        <TableRows rows={rows} />
+                        <TableRows rows={rows!} />
                     </div>
                 </CSSTransition>
             </div>
