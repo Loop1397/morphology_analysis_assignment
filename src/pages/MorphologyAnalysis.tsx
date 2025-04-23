@@ -126,7 +126,7 @@ function Index() {
                 <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
                     <TextareaAutosize
                         minRows={3}
-                        placeholder="テキストを入力"
+                        placeholder="テキストを入力してください"
                         value={text}
                         onChange={(event) => {
                             setText(event.target.value);
