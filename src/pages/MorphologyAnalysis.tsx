@@ -36,6 +36,23 @@ type Row = {
     count: number;
 };
 
+type Token = {
+    basic_form: string,
+    conjugated_form: string,
+    conjugated_type: string,
+    count: number,
+    pos: string,
+    pos_detail_1: string,
+    pos_detail_2: string,
+    pos_detail_3: string,
+    surface_form: string,
+    pronunciation?: string,
+    reading?: string,
+    word_id?: number,
+    word_position?: number,
+    word_type?: string,
+};
+
 function Index() {
     const [showTable, setShowTable] = useState(false);
     const [text, setText] = useState('');
@@ -53,12 +70,12 @@ function Index() {
             const tokens = tokenizer.tokenize(text);
 
             // 名詞以外は削除する
-            const filteredTokens = tokens.filter(token => token.pos === '名詞');
+            // const filteredTokens = tokens.filter(token => token.pos === '名詞');
 
             // 同じトークンを削除し、カウントする
-            const countedTokens: Record<string, any> = {};
+            const countedTokens: Record<string, Token> = {};
 
-            filteredTokens.forEach(token => {
+            tokens.forEach(token => {
                 const key = token.surface_form;
                 if (countedTokens[key]) {
                     countedTokens[key].count += 1;
@@ -67,22 +84,24 @@ function Index() {
                     countedTokens[key] = { ...token, 'count': 1 };
                 }
             })
+            console.log(countedTokens);
 
-            const targetObject = Object.keys(countedTokens)
-                .sort((a, b) => b.localeCompare(a, 'ja'))
-                .map(key => {
+            const targetObject = Object.values(countedTokens)
+                .sort((a, b): number => b.count - a.count)
+                .map(token => {
                     // いらない要素を削除
-                    delete countedTokens[key].word_id;
-                    delete countedTokens[key].word_position;
-                    delete countedTokens[key].word_type;
+                    delete token.word_id;
+                    delete token.word_position;
+                    delete token.word_type;
 
-                    return countedTokens[key];
+                    return token;
                 });
 
             const result = Object.values(targetObject);
 
             return result;
         } catch (error) {
+            console.log(error);
             return null;
         }
     }
