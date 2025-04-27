@@ -54,13 +54,17 @@ type Token = {
 };
 
 function Index() {
-    const [showTable, setShowTable] = useState(false);
-    const [text, setText] = useState('');
+    const [showTable, setShowTable] = useState<boolean>(false);
+    const [text, setText] = useState<string>('');
     const [segmentedText, setSegmentedText] = useState<string[]>();
+    const [rows, setRows] = useState<Row[]>();
+    const [partOfSpeech, setPartOfSpeech] = useState<string>('名詞');
 
     const nodeRef = useRef(null);
 
-    const [rows, setRows] = useState<Row[]>();
+    const handlePartOfSpeech = (e: any) => {
+        setPartOfSpeech(e.target.value);
+    }
 
     const tokenizeAndCountNouns = async (): Promise<Array<any> | null> => {
         try {
@@ -69,13 +73,13 @@ function Index() {
             // 形態素解析
             const tokens = tokenizer.tokenize(text);
 
-            // 名詞以外は削除する
-            // const filteredTokens = tokens.filter(token => token.pos === '名詞');
+            // 指定された品詞以外は削除する
+            const filteredTokens = tokens.filter(token => token.pos === partOfSpeech);
 
             // 同じトークンを削除し、カウントする
             const countedTokens: Record<string, Token> = {};
 
-            tokens.forEach(token => {
+            filteredTokens.forEach(token => {
                 const key = token.surface_form;
                 if (countedTokens[key]) {
                     countedTokens[key].count += 1;
@@ -179,6 +183,14 @@ function Index() {
                     >
                         解 析
                     </button>
+                    <select className="w150" onChange={handlePartOfSpeech} value={partOfSpeech}>
+                        <option value="名詞">名詞</option>
+                        <option value="連体詞">連体詞</option>
+                        <option value="接頭詞">接頭詞</option>
+                        <option value="助詞">助詞</option>
+                        <option value="助動詞">助動詞</option>
+                        <option value="記号">記号</option>
+                    </select>
                 </div>
 
                 <CSSTransition
