@@ -53,17 +53,19 @@ type Token = {
     word_type?: string,
 };
 
+const wordClassTypes = ['全体', '名詞', '連体詞', '接頭詞', '助詞', '助動詞', '記号'];
+
 function Index() {
     const [showTable, setShowTable] = useState<boolean>(false);
     const [text, setText] = useState<string>('');
     const [segmentedText, setSegmentedText] = useState<string[]>();
     const [rows, setRows] = useState<Row[]>();
-    const [partOfSpeech, setPartOfSpeech] = useState<string>('名詞');
+    const [WordClass, setWordClass] = useState<string>('全体');
 
     const nodeRef = useRef(null);
 
-    const handlePartOfSpeech = (e: any) => {
-        setPartOfSpeech(e.target.value);
+    const handleWordClass = (e: any) => {
+        setWordClass(e.target.value);
     }
 
     const tokenizeAndCountNouns = async (): Promise<Array<any> | null> => {
@@ -71,15 +73,17 @@ function Index() {
             const tokenizer = await tokenizerPromise;
 
             // 形態素解析
-            const tokens = tokenizer.tokenize(text);
+            var tokens = tokenizer.tokenize(text);
 
             // 指定された品詞以外は削除する
-            const filteredTokens = tokens.filter(token => token.pos === partOfSpeech);
+            if (WordClass !== '全体') {
+                tokens = tokens.filter(token => token.pos === WordClass);
+            }
 
             // 同じトークンを削除し、カウントする
             const countedTokens: Record<string, Token> = {};
 
-            filteredTokens.forEach(token => {
+            tokens.forEach(token => {
                 const key = token.surface_form;
                 if (countedTokens[key]) {
                     countedTokens[key].count += 1;
@@ -174,7 +178,6 @@ function Index() {
                                         return;
                                     }
                                     setRows(formatTokensForRows(tokens));
-                                    setText('');
                                     setShowTable(true);
                                 }, 300);
                             }
@@ -183,13 +186,10 @@ function Index() {
                     >
                         解 析
                     </button>
-                    <select className="w150" onChange={handlePartOfSpeech} value={partOfSpeech}>
-                        <option value="名詞">名詞</option>
-                        <option value="連体詞">連体詞</option>
-                        <option value="接頭詞">接頭詞</option>
-                        <option value="助詞">助詞</option>
-                        <option value="助動詞">助動詞</option>
-                        <option value="記号">記号</option>
+                    <select className="w150" onChange={handleWordClass} value={WordClass}>
+                        {wordClassTypes.map(type => {
+                            return <option value='{type}'>{type}</option>
+                        })}
                     </select>
                 </div>
 
