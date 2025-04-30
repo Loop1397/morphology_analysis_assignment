@@ -150,7 +150,7 @@ function Index() {
         <div style={{ width: "800px", borderRadius: "8px", backgroundColor: "#3C424A", marginTop: "100px", padding: "20px 60px" }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
                 <h1>形態素解析</h1>
-                <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+                <div style={{ position: "relative",display: "flex", flexDirection: "column", width: "100%" }}>
                     <TextareaAutosize
                         minRows={3}
                         placeholder="テキストを入力してください"
@@ -160,6 +160,15 @@ function Index() {
                         }}
                         style={{ flexGrow: "1", marginTop: "20px", padding: "10px", backgroundColor: "#343A40", border: "none", borderBottom: "2px solid #2F3339", borderRadius: "4px", color: "#ffffff", resize: "none" }}
                     />
+                    <select 
+                        onChange={handleWordClass} 
+                        value={WordClass}
+                        style={{ position: "absolute", top: "-40px", right: "0", width: "100px", height: "30px", marginTop: "20px", backgroundColor: "#343A40", border: "none", borderBottom: "2px solid #2F3339", borderRadius: "4px"}}
+                    >
+                        {wordClassTypes.map(type => {
+                            return <option value={type}>{type}</option>
+                        })}
+                    </select>
                     <button
                         onClick={() => {
                             if (text === '') {
@@ -186,11 +195,6 @@ function Index() {
                     >
                         解 析
                     </button>
-                    <select className="w150" onChange={handleWordClass} value={WordClass}>
-                        {wordClassTypes.map(type => {
-                            return <option value='{type}'>{type}</option>
-                        })}
-                    </select>
                 </div>
 
                 <CSSTransition

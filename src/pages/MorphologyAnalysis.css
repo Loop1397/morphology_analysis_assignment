@@ -1,3 +1,11 @@
 textarea:focus {
     outline: 1px solid #20C997;
 }
+
+select:hover{
+    opacity: 0.8 !important;
+}
+
+select:focus {
+    outline: 1px solid #20C997;
+}
