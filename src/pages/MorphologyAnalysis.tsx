@@ -53,7 +53,7 @@ type Token = {
     word_type?: string,
 };
 
-const wordClassTypes = ['全体', '名詞', '連体詞', '接頭詞', '助詞', '助動詞', '記号'];
+const wordClassTypes = ['全体', '動詞', '形容詞', '形容動詞', '名詞', '副詞', '連体詞', '接続詞', '感動詞', '助動詞', '助詞', '記号'];
 
 function Index() {
     const [showTable, setShowTable] = useState<boolean>(false);
@@ -150,7 +150,7 @@ function Index() {
         <div style={{ width: "800px", borderRadius: "8px", backgroundColor: "#3C424A", marginTop: "100px", padding: "20px 60px" }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
                 <h1>形態素解析</h1>
-                <div style={{ position: "relative",display: "flex", flexDirection: "column", width: "100%" }}>
+                <div style={{ position: "relative", display: "flex", flexDirection: "column", width: "100%" }}>
                     <TextareaAutosize
                         minRows={3}
                         placeholder="テキストを入力してください"
@@ -160,13 +160,13 @@ function Index() {
                         }}
                         style={{ flexGrow: "1", marginTop: "20px", padding: "10px", backgroundColor: "#343A40", border: "none", borderBottom: "2px solid #2F3339", borderRadius: "4px", color: "#ffffff", resize: "none" }}
                     />
-                    <select 
-                        onChange={handleWordClass} 
+                    <select
+                        onChange={handleWordClass}
                         value={WordClass}
-                        style={{ position: "absolute", top: "-40px", right: "0", width: "100px", height: "30px", marginTop: "20px", backgroundColor: "#343A40", border: "none", borderBottom: "2px solid #2F3339", borderRadius: "4px"}}
+                        style={{ position: "absolute", top: "-40px", right: "0", width: "100px", height: "30px", marginTop: "20px", backgroundColor: "#343A40", border: "none", borderBottom: "2px solid #2F3339", borderRadius: "4px", color: "#ffffff" }}
                     >
                         {wordClassTypes.map(type => {
-                            return <option value={type}>{type}</option>
+                            return <option value={type} style={{ color: "#ffffff" }}>{type}</option>
                         })}
                     </select>
                     <button
