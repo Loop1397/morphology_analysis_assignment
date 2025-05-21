@@ -1,23 +1,21 @@
 import { useRef, useState } from "react";
 import "./MorphologyAnalysis.css";
 import "./TableRowsAnimation.css";
-import TextareaAutosize from 'react-textarea-autosize';
+import TextareaAutosize from "react-textarea-autosize";
 import TableRows from "../components/TableRows";
-import { CSSTransition } from 'react-transition-group';
+import { CSSTransition } from "react-transition-group";
 
-import TinySegmenter from 'tiny-segmenter';
+import TinySegmenter from "tiny-segmenter";
 import SegmentedWords from "../components/SegmentedWords";
-import * as kuromoji from '@patdx/kuromoji';
+import * as kuromoji from "@patdx/kuromoji";
 
 const segmenter = new TinySegmenter(); // インスタンス生成
 
 const myLoader: kuromoji.LoaderConfig = {
     async loadArrayBuffer(url: string): Promise<ArrayBufferLike> {
         // .gz 확장자를 제거합니다.
-        url = url.replace('.gz', '');
-        const res = await fetch(
-            'https://cdn.jsdelivr.net/npm/@aiktb/kuromoji@1.0.2/dict/' + url,
-        );
+        url = url.replace(".gz", "");
+        const res = await fetch("https://cdn.jsdelivr.net/npm/@aiktb/kuromoji@1.0.2/dict/" + url);
         if (!res.ok) {
             throw new Error(`Failed to fetch ${url}, status: ${res.status}`);
         }
@@ -37,36 +35,36 @@ type Row = {
 };
 
 type Token = {
-    basic_form: string,
-    conjugated_form: string,
-    conjugated_type: string,
-    count: number,
-    pos: string,
-    pos_detail_1: string,
-    pos_detail_2: string,
-    pos_detail_3: string,
-    surface_form: string,
-    pronunciation?: string,
-    reading?: string,
-    word_id?: number,
-    word_position?: number,
-    word_type?: string,
+    basic_form: string;
+    conjugated_form: string;
+    conjugated_type: string;
+    count: number;
+    pos: string;
+    pos_detail_1: string;
+    pos_detail_2: string;
+    pos_detail_3: string;
+    surface_form: string;
+    pronunciation?: string;
+    reading?: string;
+    word_id?: number;
+    word_position?: number;
+    word_type?: string;
 };
 
-const wordClassTypes = ['全体', '動詞', '形容詞', '形容動詞', '名詞', '副詞', '連体詞', '接続詞', '感動詞', '助動詞', '助詞', '記号'];
+const wordClassTypes = ["名詞", "動詞", "形容詞", "形容動詞", "副詞", "連体詞", "接続詞", "感動詞", "助動詞", "助詞", "記号", "全体"];
 
 function Index() {
     const [showTable, setShowTable] = useState<boolean>(false);
-    const [text, setText] = useState<string>('');
+    const [text, setText] = useState<string>("");
     const [segmentedText, setSegmentedText] = useState<string[]>();
     const [rows, setRows] = useState<Row[]>();
-    const [WordClass, setWordClass] = useState<string>('全体');
+    const [WordClass, setWordClass] = useState<string>(wordClassTypes[0]);
 
     const nodeRef = useRef(null);
 
     const handleWordClass = (e: any) => {
         setWordClass(e.target.value);
-    }
+    };
 
     const tokenizeAndCountNouns = async (): Promise<Array<any> | null> => {
         try {
@@ -76,7 +74,7 @@ function Index() {
             var tokens = tokenizer.tokenize(text);
 
             // 指定された品詞以外は削除する
-            if (WordClass !== '全体') {
+            if (WordClass !== "全体") {
                 tokens = tokens.filter(token => token.pos === WordClass);
             }
 
@@ -87,11 +85,10 @@ function Index() {
                 const key = token.surface_form;
                 if (countedTokens[key]) {
                     countedTokens[key].count += 1;
+                } else {
+                    countedTokens[key] = { ...token, count: 1 };
                 }
-                else {
-                    countedTokens[key] = { ...token, 'count': 1 };
-                }
-            })
+            });
             console.log(countedTokens);
 
             const targetObject = Object.values(countedTokens)
@@ -112,22 +109,14 @@ function Index() {
             console.log(error);
             return null;
         }
-    }
+    };
 
     const formatTokensForRows = (tokens: Array<any>): Row[] => {
         console.log(tokens);
         const result: Row[] = [];
 
         tokens.forEach((token, index) => {
-            const features = [
-                token.pos,
-                token.pos_detail_1,
-                token.pos_detail_2,
-                token.pos_detail_3,
-                token.conjugated_form,
-                token.conjugated_type,
-                token.basic_form,
-            ];
+            const features = [token.pos, token.pos_detail_1, token.pos_detail_2, token.pos_detail_3, token.conjugated_form, token.conjugated_type, token.basic_form];
 
             // 下の２つはないかもしれないので条件をつける
             if (token.pronunciation) features.push(token.pronunciation);
@@ -136,7 +125,7 @@ function Index() {
             const targetObject = {
                 id: index + 1,
                 word: token.surface_form,
-                features: features.join(','),
+                features: features.join(","),
                 count: token.count,
             };
 
@@ -144,7 +133,7 @@ function Index() {
         });
 
         return result;
-    }
+    };
 
     return (
         <div style={{ width: "800px", borderRadius: "8px", backgroundColor: "#3C424A", marginTop: "100px", padding: "20px 60px" }}>
@@ -155,26 +144,51 @@ function Index() {
                         minRows={3}
                         placeholder="テキストを入力してください"
                         value={text}
-                        onChange={(event) => {
+                        onChange={event => {
                             setText(event.target.value);
                         }}
-                        style={{ flexGrow: "1", marginTop: "20px", padding: "10px", backgroundColor: "#343A40", border: "none", borderBottom: "2px solid #2F3339", borderRadius: "4px", color: "#ffffff", resize: "none" }}
+                        style={{
+                            flexGrow: "1",
+                            marginTop: "20px",
+                            padding: "10px",
+                            backgroundColor: "#343A40",
+                            border: "none",
+                            borderBottom: "2px solid #2F3339",
+                            borderRadius: "4px",
+                            color: "#ffffff",
+                            resize: "none",
+                        }}
                     />
                     <select
                         onChange={handleWordClass}
                         value={WordClass}
-                        style={{ position: "absolute", top: "-40px", right: "0", width: "100px", height: "30px", marginTop: "20px", backgroundColor: "#343A40", border: "none", borderBottom: "2px solid #2F3339", borderRadius: "4px", color: "#ffffff" }}
+                        style={{
+                            position: "absolute",
+                            top: "-40px",
+                            right: "0",
+                            width: "100px",
+                            height: "30px",
+                            marginTop: "20px",
+                            backgroundColor: "#343A40",
+                            border: "none",
+                            borderBottom: "2px solid #2F3339",
+                            borderRadius: "4px",
+                            color: "#ffffff",
+                        }}
                     >
                         {wordClassTypes.map(type => {
-                            return <option value={type} style={{ color: "#ffffff" }}>{type}</option>
+                            return (
+                                <option value={type} style={{ color: "#ffffff" }}>
+                                    {type}
+                                </option>
+                            );
                         })}
                     </select>
                     <button
                         onClick={() => {
-                            if (text === '') {
-                                alert('先にテキストを入力してください！');
-                            }
-                            else {
+                            if (text === "") {
+                                alert("先にテキストを入力してください！");
+                            } else {
                                 if (showTable) {
                                     setShowTable(false);
                                 }
@@ -182,8 +196,8 @@ function Index() {
                                     setSegmentedText(segmenter.segment(text));
                                     const tokens = await tokenizeAndCountNouns();
                                     if (!tokens) {
-                                        setText('');
-                                        alert('ERROR!');
+                                        setText("");
+                                        alert("ERROR!");
                                         return;
                                     }
                                     setRows(formatTokensForRows(tokens));
@@ -191,31 +205,21 @@ function Index() {
                                 }, 300);
                             }
                         }}
-                        style={{ marginTop: "20px", }}
+                        style={{ marginTop: "20px" }}
                     >
                         解 析
                     </button>
                 </div>
 
-                <CSSTransition
-                    in={showTable}
-                    timeout={500}
-                    mountOnEnter
-                    unmountOnExit
-                    classNames="fade-slide"
-                    nodeRef={nodeRef}
-                >
-                    <div
-                        ref={nodeRef}
-                        style={{ width: "100%", overflow: "hidden" }}
-                    >
-                        <div style={{ width: "100%", height: "2px", backgroundColor: "#343840", marginTop: "20px", }}></div>
+                <CSSTransition in={showTable} timeout={500} mountOnEnter unmountOnExit classNames="fade-slide" nodeRef={nodeRef}>
+                    <div ref={nodeRef} style={{ width: "100%", overflow: "hidden" }}>
+                        <div style={{ width: "100%", height: "2px", backgroundColor: "#343840", marginTop: "20px" }}></div>
                         <SegmentedWords separate={segmentedText!} />
                         <TableRows rows={rows!} />
                     </div>
                 </CSSTransition>
             </div>
-        </div >
+        </div>
     );
 }
 
